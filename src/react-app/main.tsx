@@ -1,10 +1,14 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.tsx";
+import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
 
-createRoot(document.getElementById("root")!).render(
-	<StrictMode>
-		<App />
-	</StrictMode>,
-);
+addEventListener('fetch', (event) => {
+  event.respondWith(handleRequest(event));
+});
+
+async function handleRequest(event: FetchEvent) {
+  try {
+    const response = await getAssetFromKV(event);
+    return response;
+  } catch (err) {
+    return new Response('Page not found', { status: 404 });
+  }
+}
