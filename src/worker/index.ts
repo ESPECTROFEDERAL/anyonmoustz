@@ -1,6 +1,14 @@
-import { Hono } from "hono";
-const app = new Hono<{ Bindings: Env }>();
+import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
 
-app.get("/api/", (c) => c.json({ name: "Cloudflare" }));
+addEventListener('fetch', (event) => {
+  event.respondWith(handleRequest(event));
+});
 
-export default app;
+async function handleRequest(event: FetchEvent) {
+  try {
+    const response = await getAssetFromKV(event);
+    return response;
+  } catch (err) {
+    return new Response('Page not found', { status: 404 });
+  }
+}
